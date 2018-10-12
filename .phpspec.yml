@@ -1,4 +1,4 @@
 suites:
-    container_suite:
-        namespace: danmurf
-        psr4_prefix: danmurf
+    dependency_injection_suite:
+        namespace: danmurf\DependencyInjection
+        psr4_prefix: danmurf\DependencyInjection
