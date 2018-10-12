@@ -17,9 +17,30 @@ class ServiceFactorySpec extends ObjectBehavior
         $this::create(ServiceFactoryTest::class)->shouldReturnAnInstanceOf(ServiceFactoryTest::class);
     }
 
-    public function it_can_build_a_service_with_arguments()
+    public function it_can_build_a_service_with_configured_arguments()
     {
-        $this::create(ServiceFactoryTestWithArguments::class, ['some_string', 123, ['an' => 'array']]);
+        $config = [
+            ServiceFactoryTestWithArguments::class => [
+                'arguments' => [
+                    [
+                        'type' => 'scalar',
+                        'value' => 'some_string',
+                    ],
+                    [
+                        'type' => 'scalar',
+                        'value' => 123,
+                    ],
+                    [
+                        'type' => 'scalar',
+                        'value' => [
+                            'an' => 'array',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this::create(ServiceFactoryTestWithArguments::class, $config);
     }
 }
 
