@@ -1,0 +1,16 @@
+{
+    "name": "danmurf/container",
+    "description": "A lightweight, auto-wire container.",
+    "type": "library",
+    "require-dev": {
+        "phpspec/phpspec": "^5.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Murfitt",
+            "email": "dan@murfitt.net"
+        }
+    ],
+    "require": {}
+}
