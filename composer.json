@@ -5,6 +5,11 @@
     "require-dev": {
         "phpspec/phpspec": "^5.0"
     },
+    "autoload": {
+        "psr-4": {
+            "danmurf\\": "src/"
+        }
+    },
     "license": "MIT",
     "authors": [
         {

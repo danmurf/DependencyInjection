@@ -1,0 +1,4 @@
+suites:
+    container_suite:
+        namespace: danmurf
+        psr4_prefix: danmurf
