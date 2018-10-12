@@ -1,13 +1,13 @@
 {
-    "name": "danmurf/container",
-    "description": "A lightweight, auto-wire container.",
+    "name": "danmurf/dependencyinjection",
+    "description": "A lightweight, auto-wire dependency injection container.",
     "type": "library",
     "require-dev": {
         "phpspec/phpspec": "^5.0"
     },
     "autoload": {
         "psr-4": {
-            "danmurf\\": "src/"
+            "danmurf\\DependencyInjection\\": "src/"
         }
     },
     "license": "MIT",
@@ -17,5 +17,7 @@
             "email": "dan@murfitt.net"
         }
     ],
-    "require": {}
+    "require": {
+        "psr/container": "^1.0"
+    }
 }
