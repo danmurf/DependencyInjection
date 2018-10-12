@@ -4,6 +4,7 @@ namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\ServiceFactory;
 use PhpSpec\ObjectBehavior;
+use Psr\Container\ContainerInterface;
 
 class ServiceFactorySpec extends ObjectBehavior
 {
@@ -40,7 +41,29 @@ class ServiceFactorySpec extends ObjectBehavior
             ],
         ];
 
-        $this::create(ServiceFactoryTestWithArguments::class, $config);
+        $this::create(ServiceFactoryTestWithArguments::class, $config)
+        ->shouldReturnAnInstanceOf(ServiceFactoryTestWithArguments::class);
+    }
+
+    public function it_can_build_a_service_with_a_configured_service_argument(
+        ContainerInterface $container
+    ) {
+        $config = [
+            ServiceFactoryTestWithServiceArgument::class => [
+                'arguments' => [
+                    [
+                        'type' => 'service',
+                        'value' => ServiceFactoryTest::class,
+                    ],
+                ],
+            ],
+        ];
+
+        $serviceFactoryTest = new ServiceFactoryTest();
+        $container->get(ServiceFactoryTest::class)->willReturn($serviceFactoryTest);
+
+        $this::create(ServiceFactoryTestWithServiceArgument::class, $config, $container)
+            ->shouldReturnAnInstanceOf(ServiceFactoryTestWithServiceArgument::class);
     }
 }
 
@@ -51,6 +74,13 @@ class ServiceFactoryTest
 class ServiceFactoryTestWithArguments
 {
     public function __construct(string $someString, int $someInt, array $someArray)
+    {
+    }
+}
+
+class ServiceFactoryTestWithServiceArgument
+{
+    public function __construct(ServiceFactoryTest $serviceFactoryTest)
     {
     }
 }
