@@ -20,16 +20,16 @@ class ContainerSpec extends ObjectBehavior
 
     public function it_can_instansiate_a_new_instance()
     {
-        $this->get(TestClass::class)->shouldReturnAnInstanceOf(TestClass::class);
+        $this->get(ContainerTestClass::class)->shouldReturnAnInstanceOf(ContainerTestClass::class);
     }
 
     public function it_always_returns_the_same_instance()
     {
-        $testClass = $this->get(TestClass::class);
-        $this->get(TestClass::class)->shouldReturn($testClass);
+        $testClass = $this->get(ContainerTestClass::class);
+        $this->get(ContainerTestClass::class)->shouldReturn($testClass);
     }
 }
 
-class TestClass
+class ContainerTestClass
 {
 }
