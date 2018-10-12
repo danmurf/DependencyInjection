@@ -11,9 +11,7 @@ class Container implements ContainerInterface
     public function get($className)
     {
         if (!$this->hasInstance($className)) {
-            $this->saveInstance(
-                $this->buildInstance($className)
-            );
+            $this->store($this->build($className));
         }
 
         return $this->instances[$className];
@@ -28,12 +26,12 @@ class Container implements ContainerInterface
         return isset($this->instances[$className]);
     }
 
-    private function buildInstance(string $className)
+    private function build(string $className)
     {
         return new $className();
     }
 
-    private function saveInstance($instance)
+    private function store($instance)
     {
         $this->instances[get_class($instance)] = $instance;
     }
