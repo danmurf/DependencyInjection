@@ -17,4 +17,19 @@ class ContainerSpec extends ObjectBehavior
     {
         $this->shouldImplement(ContainerInterface::class);
     }
+
+    public function it_can_instansiate_a_new_instance()
+    {
+        $this->get(TestClass::class)->shouldReturnAnInstanceOf(TestClass::class);
+    }
+
+    public function it_always_returns_the_same_instance()
+    {
+        $testClass = $this->get(TestClass::class);
+        $this->get(TestClass::class)->shouldReturn($testClass);
+    }
+}
+
+class TestClass
+{
 }
