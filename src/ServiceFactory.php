@@ -2,10 +2,18 @@
 
 namespace danmurf\DependencyInjection;
 
+use ReflectionClass;
+
 class ServiceFactory
 {
-    public static function create(string $class)
+    public static function create(string $className, $args = [])
     {
-        return new $class();
+        $class = new ReflectionClass($className);
+
+        if (count($args) > 0) {
+            return $class->newInstanceArgs($args);
+        }
+
+        return $class->newInstance();
     }
 }
