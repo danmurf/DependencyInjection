@@ -40,7 +40,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
                     break;
 
                 case 'service':
-                    $args[] = $this->locate($argumentConfig['value'], $container);
+                    $args[] = $container->get($argumentConfig['value']);
                     break;
 
                 default:

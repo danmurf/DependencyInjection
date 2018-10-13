@@ -79,7 +79,12 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->beConstructedWith($config);
 
+        $container->get('my.service.dependency')->willReturn(new ConfigurableServiceLocatorTestClass());
+
         $this->locate('my.service.id', $container)->shouldReturnAnInstanceOf(ConfigurableServiceLocatorTestClassWithServiceArgs::class);
+
+        // Dependencies should be resolved from the container
+        $container->get('my.service.dependency')->shouldHaveBeenCalled();
     }
 }
 
