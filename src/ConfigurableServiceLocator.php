@@ -34,6 +34,13 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
 
         $args = [];
         foreach ($this->config[$id]['arguments'] as $argumentConfig) {
+            if (!isset($argumentConfig['type']) || !isset($argumentConfig['value'])) {
+                throw new ContainerException(sprintf(
+                    'Configuration for service `%s` must have `type` and `value` values.',
+                    $id
+                ));
+            }
+
             switch ($argumentConfig['type']) {
                 case 'scalar':
                     $args[] = $argumentConfig['value'];
@@ -44,7 +51,11 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
                     break;
 
                 default:
-                    throw new ContainerException(sprintf('Unknown argument type `%s`. Accepted values are `scalar` and `service`.', $argumentConfig['type']));
+                    throw new ContainerException(sprintf(
+                        'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
+                        (string) $argumentConfig['type'],
+                        $id
+                    ));
             }
         }
 

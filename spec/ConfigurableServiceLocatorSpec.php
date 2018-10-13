@@ -4,6 +4,7 @@ namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
 use danmurf\DependencyInjection\Exception\ContainerException;
+use danmurf\DependencyInjection\Exception\NotFoundException;
 use danmurf\DependencyInjection\ServiceLocatorInterface;
 use PhpSpec\ObjectBehavior;
 use Psr\Container\ContainerInterface;
@@ -92,6 +93,49 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
     {
         $config = [
             'my.service.dependency' => [],
+        ];
+
+        $this->beConstructedWith($config);
+
+        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
+    }
+
+    public function it_throws_a_not_found_exception_when_trying_to_location_a_service_which_hasnt_been_configured(ContainerInterface $container)
+    {
+        $this->shouldThrow(NotFoundException::class)->during('locate', ['non.existant.service', $container]);
+    }
+
+    public function it_throws_a_container_exception_when_an_unknown_argument_type_is_encountered(ContainerInterface $container)
+    {
+        $config = [
+            'my.broken.service' => [
+                'class' => ConfigurableServiceLocatorTestClass::class,
+                'arguments' => [
+                    [
+                        'type' => 'invalid',
+                        'value' => 'some_value',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+
+        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
+    }
+
+    public function it_throws_a_container_exception_if_an_argument_doesnt_have_a_type_and_value(ContainerInterface $container)
+    {
+        $config = [
+            'my.broken.service' => [
+                'class' => ConfigurableServiceLocatorTestClass::class,
+                'arguments' => [
+                    [
+                        'broken' => 'foo',
+                        'invalid' => 'bar',
+                    ],
+                ],
+            ],
         ];
 
         $this->beConstructedWith($config);
