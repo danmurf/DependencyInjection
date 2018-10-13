@@ -59,6 +59,28 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->locate('my.service.id', $container)->shouldReturnAnInstanceOf(ConfigurableServiceLocatorTestClassWithArgs::class);
     }
+
+    public function it_can_return_a_new_instance_of_a_service_with_service_arguments_from_configuration(ContainerInterface $container)
+    {
+        $config = [
+            'my.service.dependency' => [
+                'class' => ConfigurableServiceLocatorTestClass::class,
+            ],
+            'my.service.id' => [
+                'class' => ConfigurableServiceLocatorTestClassWithServiceArgs::class,
+                'arguments' => [
+                    [
+                        'type' => 'service',
+                        'value' => 'my.service.dependency',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+
+        $this->locate('my.service.id', $container)->shouldReturnAnInstanceOf(ConfigurableServiceLocatorTestClassWithServiceArgs::class);
+    }
 }
 
 class ConfigurableServiceLocatorTestClass
@@ -68,6 +90,13 @@ class ConfigurableServiceLocatorTestClass
 class ConfigurableServiceLocatorTestClassWithArgs
 {
     public function __construct(int $arg1, string $arg2)
+    {
+    }
+}
+
+class ConfigurableServiceLocatorTestClassWithServiceArgs
+{
+    public function __construct(ConfigurableServiceLocatorTestClass $dependency)
     {
     }
 }
