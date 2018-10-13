@@ -9,6 +9,14 @@ use ReflectionClass;
 
 class ConfigurableServiceLocator implements ServiceLocatorInterface
 {
+    const ARGUMENT_TYPE_SCALAR = 'scalar';
+    const ARGUMENT_TYPE_SERVICE = 'service';
+
+    const ARGUMENT_TYPES = [
+            self::ARGUMENT_TYPE_SCALAR,
+            self::ARGUMENT_TYPE_SERVICE,
+        ];
+
     private $config;
 
     public function __construct(array $config)
@@ -32,11 +40,11 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
         $args = [];
         foreach ($this->config[$id]['arguments'] as $argumentConfig) {
             switch ($argumentConfig['type']) {
-                case 'scalar':
+                case self::ARGUMENT_TYPE_SCALAR:
                     $args[] = $argumentConfig['value'];
                     break;
 
-                case 'service':
+                case self::ARGUMENT_TYPE_SERVICE:
                     $args[] = $container->get($argumentConfig['value']);
                     break;
             }
@@ -61,7 +69,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
                         ));
                     }
 
-                    if (false === array_search($argument['type'], ['scalar', 'service'])) {
+                    if (false === array_search($argument['type'], self::ARGUMENT_TYPES)) {
                         throw new ContainerException(sprintf(
                             'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
                             (string) $argument['type'],
