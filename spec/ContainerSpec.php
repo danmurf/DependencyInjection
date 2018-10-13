@@ -3,11 +3,20 @@
 namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\Container;
+use danmurf\DependencyInjection\Exception\ContainerException;
+use danmurf\DependencyInjection\Exception\NotFoundException;
+use danmurf\DependencyInjection\ServiceLocatorInterface;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 
 class ContainerSpec extends ObjectBehavior
 {
+    public function let(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->beConstructedWith($serviceLocator);
+    }
+
     public function it_is_initializable()
     {
         $this->shouldHaveType(Container::class);
@@ -18,15 +27,60 @@ class ContainerSpec extends ObjectBehavior
         $this->shouldImplement(ContainerInterface::class);
     }
 
-    public function it_can_instansiate_a_new_instance()
+    public function it_can_register_services()
     {
-        $this->get(ContainerTestClass::class)->shouldReturnAnInstanceOf(ContainerTestClass::class);
+        $service = new ContainerTestClass();
+
+        $this->register($service, 'my.service');
+
+        $this->get('my.service')->shouldReturn($service);
     }
 
-    public function it_always_returns_the_same_instance()
+    public function it_can_register_a_service_and_infer_the_id()
     {
-        $testClass = $this->get(ContainerTestClass::class);
-        $this->get(ContainerTestClass::class)->shouldReturn($testClass);
+        $service = new ContainerTestClass();
+
+        $this->register($service);
+
+        $this->get(ContainerTestClass::class)->shouldReturn($service);
+    }
+
+    public function it_throws_a_container_exception_if_trying_to_register_a_service_which_isnt_an_object()
+    {
+        $this->shouldThrow(ContainerException::class)->during('register', ['a string']);
+    }
+
+    public function it_can_use_the_service_locator_to_self_register_an_instance(ServiceLocatorInterface $serviceLocator)
+    {
+        $service = new ContainerTestClass();
+        $serviceLocator->locate(ContainerTestClass::class)->willReturn($service);
+
+        $this->get(ContainerTestClass::class)->shouldReturn($service);
+
+        $serviceLocator->locate(ContainerTestClass::class)->shouldHaveBeenCalled();
+    }
+
+    public function it_can_determine_if_it_has_an_instance()
+    {
+        $service = new ContainerTestClass();
+
+        $this->register($service);
+
+        $this->has(ContainerTestClass::class)->shouldReturn(true);
+    }
+
+    public function it_can_determine_if_it_is_unable_to_locate_a_service(ServiceLocatorInterface $serviceLocator)
+    {
+        $serviceLocator->locate('not.found')->willThrow(NotFoundException::class);
+
+        $this->has('not.found')->shouldReturn(false);
+    }
+
+    public function it_passes_through_a_not_found_exception_when_an_attempt_to_get_an_unlocatable_service_is_made(ServiceLocatorInterface $serviceLocator)
+    {
+        $serviceLocator->locate(Argument::type('string'))->willThrow(NotFoundException::class);
+
+        $this->shouldThrow(NotFoundException::class)->during('get', ['some.service']);
     }
 }
 

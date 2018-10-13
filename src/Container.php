@@ -2,37 +2,88 @@
 
 namespace danmurf\DependencyInjection;
 
+use danmurf\DependencyInjection\Exception\ContainerException;
+use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
+    /** @var ServiceLocatorInterface */
+    private $serviceLocator;
+
     private $instances = [];
 
-    public function get($className)
+    public function __construct(ServiceLocatorInterface $serviceLocator)
     {
-        if (!$this->hasInstance($className)) {
-            $this->store($this->build($className));
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    /**
+     * Get an instance of a service.
+     *
+     * @param string $id registered service ID or FQCN
+     *
+     * @throws NotFoundException
+     */
+    public function get($id)
+    {
+        if (!$this->hasInstance($id)) {
+            $this->register($this->serviceLocator->locate($id), $id);
         }
 
-        return $this->instances[$className];
+        return $this->instances[$id];
     }
 
-    public function has($className): bool
+    /**
+     * Determine if the container can locate an instance of the specified service ID or FQCN.
+     *
+     * @param string $id
+     *
+     * @return bool
+     */
+    public function has($id): bool
     {
+        if ($this->hasInstance($id)) {
+            return true;
+        }
+
+        try {
+            $this->register($this->serviceLocator->locate($id), $id);
+        } catch (NotFoundException $exception) {
+            return false;
+        }
+
+        return false;
     }
 
-    private function hasInstance(string $className): bool
+    /**
+     * Register a service with the container.
+     *
+     * @param mixed       $instance An instance of a service
+     * @param string|null $id       A specified service ID (FQCN will be used in the case of `null`)
+     */
+    public function register($instance, string $id = null)
     {
-        return isset($this->instances[$className]);
+        if (!is_object($instance)) {
+            throw new ContainerException('Only objects can be registered with the container.');
+        }
+
+        if (null === $id) {
+            $id = get_class($instance);
+        }
+
+        $this->instances[$id] = $instance;
     }
 
-    private function build(string $className)
+    /**
+     * Determine if the container has a registered instance of the service.
+     *
+     * @param string $id
+     *
+     * @return bool
+     */
+    private function hasInstance(string $id): bool
     {
-        return new $className();
-    }
-
-    private function store($instance)
-    {
-        $this->instances[get_class($instance)] = $instance;
+        return isset($this->instances[$id]);
     }
 }
