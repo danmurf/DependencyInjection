@@ -6,4 +6,4 @@ php:
 install: composer install
 
 script:
-  - composer test
+  - vendor/bin/phpspec run --config=.phpspec.yml --no-interaction
