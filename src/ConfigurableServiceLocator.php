@@ -25,6 +25,15 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
         $this->config = $config;
     }
 
+    /**
+     * Get a new instance of a service.
+     *
+     * @param string             $id        the service id
+     * @param ContainerInterface $container the container to get services dependencies from
+     *
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
     public function locate(string $id, ContainerInterface $container)
     {
         if (!isset($this->config[$id])) {
@@ -53,6 +62,13 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
         return $class->newInstanceArgs($args);
     }
 
+    /**
+     * Ensure the config is in a valid format.
+     *
+     * @param array $config
+     *
+     * @throws ContainerException
+     */
     private function validateConfig(array $config)
     {
         foreach ($config as $id => $service) {
