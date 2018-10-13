@@ -6,7 +6,6 @@ use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
-use function sprintf;
 
 /**
  * Service locator which can get find and build services using
