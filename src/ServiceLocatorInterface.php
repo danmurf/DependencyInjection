@@ -10,8 +10,8 @@ interface ServiceLocatorInterface
     /**
      * Return a new instance of a service.
      *
-     * @param string $id the service's configured ID
-     * @param ContainerInterface a container where dependencies for this service can be found
+     * @param string             $id        The service's configured ID
+     * @param ContainerInterface $container A container where dependencies for this service can be found
      *
      * @return mixed The service instance
      *
