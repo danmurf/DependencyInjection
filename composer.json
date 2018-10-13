@@ -19,5 +19,8 @@
     ],
     "require": {
         "psr/container": "^1.0"
+    },
+    "scripts": {
+        "test": "phpspec run"
     }
 }
