@@ -6,7 +6,14 @@ use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use function sprintf;
 
+/**
+ * Service locator which can get find and build services using
+ * pre-defined configuration.
+ *
+ * @author Dan Murfitt <dan@murfitt.net>
+ */
 class ConfigurableServiceLocator implements ServiceLocatorInterface
 {
     const ARGUMENT_TYPE_SCALAR = 'scalar';
@@ -17,8 +24,12 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             self::ARGUMENT_TYPE_SERVICE,
         ];
 
+    /** @var array */
     private $config;
 
+    /**
+     * @param array $config
+     */
     public function __construct(array $config)
     {
         $this->validateConfig($config);
@@ -29,12 +40,12 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
      * Get a new instance of a service.
      *
      * @param string             $id        the service id
-     * @param ContainerInterface $container the container to get services dependencies from
+     * @param ContainerInterface $container the container to get service dependencies from
      *
      * @throws ContainerException
      * @throws NotFoundException
      */
-    public function locate(string $id, ContainerInterface $container)
+    public function locate($id, ContainerInterface $container)
     {
         if (!isset($this->config[$id])) {
             throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));

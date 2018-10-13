@@ -6,13 +6,23 @@ use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 
+/**
+ * Simple dependency injection container with configurable service
+ * location strategies.
+ *
+ * @author Dan Murfitt <dan@murfitt.net>
+ */
 class Container implements ContainerInterface
 {
     /** @var ServiceLocatorInterface */
     private $serviceLocator;
 
+    /** @var array */
     private $instances = [];
 
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     */
     public function __construct(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
@@ -78,7 +88,7 @@ class Container implements ContainerInterface
     /**
      * Determine if the container has a registered instance of the service.
      *
-     * @param string $id
+     * @param string $id service id or FQCN
      *
      * @return bool
      */

@@ -50,8 +50,9 @@ class ContainerSpec extends ObjectBehavior
         $this->shouldThrow(ContainerException::class)->during('register', ['a string']);
     }
 
-    public function it_can_use_the_service_locator_to_self_register_an_instance(ServiceLocatorInterface $serviceLocator)
-    {
+    public function it_can_use_the_service_locator_to_self_register_an_instance(
+        ServiceLocatorInterface $serviceLocator
+    ) {
         $service = new ContainerTestClass();
         $serviceLocator->locate(ContainerTestClass::class, $this)->willReturn($service);
 
@@ -69,15 +70,17 @@ class ContainerSpec extends ObjectBehavior
         $this->has(ContainerTestClass::class)->shouldReturn(true);
     }
 
-    public function it_can_determine_if_it_is_unable_to_locate_a_service(ServiceLocatorInterface $serviceLocator)
-    {
+    public function it_can_determine_if_it_is_unable_to_locate_a_service(
+        ServiceLocatorInterface $serviceLocator
+    ) {
         $serviceLocator->locate('not.found', $this)->willThrow(NotFoundException::class);
 
         $this->has('not.found')->shouldReturn(false);
     }
 
-    public function it_passes_through_a_not_found_exception_when_an_attempt_to_get_an_unlocatable_service_is_made(ServiceLocatorInterface $serviceLocator)
-    {
+    public function it_passes_through_a_not_found_exception_when_an_attempt_to_get_an_unlocatable_service_is_made(
+        ServiceLocatorInterface $serviceLocator
+    ) {
         $serviceLocator->locate(Argument::type('string'), $this)->willThrow(NotFoundException::class);
 
         $this->shouldThrow(NotFoundException::class)->during('get', ['some.service']);
