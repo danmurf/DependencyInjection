@@ -3,6 +3,7 @@
 namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
+use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\ServiceLocatorInterface;
 use PhpSpec\ObjectBehavior;
 use Psr\Container\ContainerInterface;
@@ -85,6 +86,17 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         // Dependencies should be resolved from the container
         $container->get('my.service.dependency')->shouldHaveBeenCalled();
+    }
+
+    public function it_throws_a_container_exception_when_a_configured_service_has_no_class(ContainerInterface $container)
+    {
+        $config = [
+            'my.service.dependency' => [],
+        ];
+
+        $this->beConstructedWith($config);
+
+        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
     }
 }
 
