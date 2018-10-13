@@ -1,6 +1,6 @@
 {
     "name": "danmurf/dependencyinjection",
-    "description": "A lightweight, auto-wire dependency injection container.",
+    "description": "A lightweight, configurable, auto-wire dependency injection container.",
     "type": "library",
     "require-dev": {
         "phpspec/phpspec": "^5.0"
