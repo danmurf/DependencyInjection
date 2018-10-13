@@ -70,6 +70,16 @@ class ContainerSpec extends ObjectBehavior
         $this->has(ContainerTestClass::class)->shouldReturn(true);
     }
 
+    public function it_can_determine_if_it_is_able_to_locate_a_service(
+        ServiceLocatorInterface $serviceLocator
+    ) {
+        $instance = new \stdClass();
+
+        $serviceLocator->locate('found.service', $this)->willReturn($instance);
+
+        $this->has('found.service')->shouldReturn(true);
+    }
+
     public function it_can_determine_if_it_is_unable_to_locate_a_service(
         ServiceLocatorInterface $serviceLocator
     ) {

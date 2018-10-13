@@ -63,7 +63,7 @@ class Container implements ContainerInterface
             return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
