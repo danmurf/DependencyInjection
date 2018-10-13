@@ -28,8 +28,15 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
 
         $class = new ReflectionClass($this->config[$id]['class']);
 
-        $instance = $class->newInstance();
+        if (!isset($this->config[$id]['arguments'])) {
+            return $class->newInstance();
+        }
 
-        return $instance;
+        $args = [];
+        foreach ($this->config[$id]['arguments'] as $argumentConfig) {
+            $args[] = $argumentConfig['value'];
+        }
+
+        return $class->newInstanceArgs($args);
     }
 }
