@@ -13,6 +13,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
 
     public function __construct(array $config)
     {
+        $this->validateConfig($config);
         $this->config = $config;
     }
 
@@ -20,10 +21,6 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     {
         if (!isset($this->config[$id])) {
             throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
-        }
-
-        if (!isset($this->config[$id]['class'])) {
-            throw new ContainerException(sptintf('Configured service `%s` has no `class` value.', $id));
         }
 
         $class = new ReflectionClass($this->config[$id]['class']);
@@ -34,13 +31,6 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
 
         $args = [];
         foreach ($this->config[$id]['arguments'] as $argumentConfig) {
-            if (!isset($argumentConfig['type']) || !isset($argumentConfig['value'])) {
-                throw new ContainerException(sprintf(
-                    'Configuration for service `%s` must have `type` and `value` values.',
-                    $id
-                ));
-            }
-
             switch ($argumentConfig['type']) {
                 case 'scalar':
                     $args[] = $argumentConfig['value'];
@@ -49,16 +39,37 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
                 case 'service':
                     $args[] = $container->get($argumentConfig['value']);
                     break;
-
-                default:
-                    throw new ContainerException(sprintf(
-                        'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
-                        (string) $argumentConfig['type'],
-                        $id
-                    ));
             }
         }
 
         return $class->newInstanceArgs($args);
+    }
+
+    private function validateConfig(array $config)
+    {
+        foreach ($config as $id => $service) {
+            if (!isset($service['class'])) {
+                throw new ContainerException(sprintf('Configured service `%s` has no `class` value.', $id));
+            }
+
+            if (isset($service['arguments'])) {
+                foreach ($service['arguments'] as $argument) {
+                    if (!isset($argument['type']) || !isset($argument['value'])) {
+                        throw new ContainerException(sprintf(
+                            'Configuration for service `%s` must have `type` and `value` values.',
+                            $id
+                        ));
+                    }
+
+                    if (false === array_search($argument['type'], ['scalar', 'service'])) {
+                        throw new ContainerException(sprintf(
+                            'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
+                            (string) $argument['type'],
+                            $id
+                        ));
+                    }
+                }
+            }
+        }
     }
 }

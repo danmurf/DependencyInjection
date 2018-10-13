@@ -97,7 +97,7 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->beConstructedWith($config);
 
-        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
+        $this->shouldThrow(ContainerException::class)->duringInstantiation();
     }
 
     public function it_throws_a_not_found_exception_when_trying_to_location_a_service_which_hasnt_been_configured(ContainerInterface $container)
@@ -121,7 +121,7 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->beConstructedWith($config);
 
-        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
+        $this->shouldThrow(ContainerException::class)->duringInstantiation();
     }
 
     public function it_throws_a_container_exception_if_an_argument_doesnt_have_a_type_and_value(ContainerInterface $container)
@@ -140,7 +140,7 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->beConstructedWith($config);
 
-        $this->shouldThrow(ContainerException::class)->during('locate', ['my.broken.service', $container]);
+        $this->shouldThrow(ContainerException::class)->duringInstantiation();
     }
 }
 
