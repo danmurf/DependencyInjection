@@ -28,7 +28,7 @@ class Container implements ContainerInterface
     public function get($id)
     {
         if (!$this->hasInstance($id)) {
-            $this->register($this->serviceLocator->locate($id), $id);
+            $this->register($this->serviceLocator->locate($id, $this), $id);
         }
 
         return $this->instances[$id];
@@ -48,7 +48,7 @@ class Container implements ContainerInterface
         }
 
         try {
-            $this->register($this->serviceLocator->locate($id), $id);
+            $this->register($this->serviceLocator->locate($id, $this), $id);
         } catch (NotFoundException $exception) {
             return false;
         }
