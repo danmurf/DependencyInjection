@@ -25,6 +25,7 @@ class AutoWireServiceLocator extends ConfigurableServiceLocator
         try {
             return parent::locate($id, $container);
         } catch (NotFoundException $exception) {
+            // Service isn't in config, so attempt to autowire...
         }
 
         try {
