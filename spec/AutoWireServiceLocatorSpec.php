@@ -5,6 +5,7 @@ namespace spec\danmurf\DependencyInjection;
 use danmurf\DependencyInjection\AutoWireServiceLocator;
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
 use PhpSpec\ObjectBehavior;
+use Psr\Container\ContainerInterface;
 
 class AutoWireServiceLocatorSpec extends ObjectBehavior
 {
@@ -22,4 +23,14 @@ class AutoWireServiceLocatorSpec extends ObjectBehavior
     {
         $this->shouldBeAnInstanceOf(ConfigurableServiceLocator::class);
     }
+
+    public function it_can_locate_a_service_without_configuration(ContainerInterface $container)
+    {
+        $this->locate(TestAutoWireService::class, $container)
+            ->shouldReturnAnInstanceOf(TestAutoWireService::class);
+    }
+}
+
+class TestAutoWireService
+{
 }
