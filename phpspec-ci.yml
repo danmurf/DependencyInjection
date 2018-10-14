@@ -1,5 +1,5 @@
 extensions:
-  - PhpSpec\Extension\CodeCoverageExtension
+  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension: ~
 code_coverage:
   whitelist:
     - src
@@ -7,3 +7,7 @@ code_coverage:
     - clover
   output:
     clover: coverage.clover
+suites:
+    dependency_injection_suite:
+        namespace: danmurf\DependencyInjection
+        psr4_prefix: danmurf\DependencyInjection
