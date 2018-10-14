@@ -7,13 +7,23 @@ use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionParameter;
 
 class AutoWireServiceLocator extends ConfigurableServiceLocator
 {
+    /**
+     * If the service doesn't exist in config, attemtpt to autowire it.
+     *
+     * @param string             $id        The service ID or FQCN
+     * @param ContainerInterface $container The container to get service dependencies from
+     *
+     * @throws NotFoundException
+     * @throws ContainerException
+     */
     public function locate($id, ContainerInterface $container)
     {
         try {
-            parent::locate($id, $container);
+            return parent::locate($id, $container);
         } catch (NotFoundException $exception) {
         }
 
@@ -23,19 +33,60 @@ class AutoWireServiceLocator extends ConfigurableServiceLocator
             throw new NotFoundException(sprintf('Unable to autowire class `%s`.', $id));
         }
 
-        if (null !== $constructor = $class->getConstructor()) {
-            $args = [];
-            foreach ($constructor->getParameters() as $parameter) {
-                if (null === $dependencyClass = $parameter->getClass()) {
-                    throw new ContainerException(sprintf('Unable to autowire service `%s` as it has scalar arguments.', $id));
-                }
-
-                $args[] = $container->get($dependencyClass->getName());
-            }
-
-            return $class->newInstanceArgs($args);
+        if (null !== $class->getConstructor()) {
+            return $this->instantiateClassWithConstructor($class, $container, $id);
         }
 
         return $class->newInstance();
+    }
+
+    /**
+     * Get a dependency from a method parameter.
+     *
+     * @param ReflectionParameter $parameter
+     * @param ContainerInterface  $container
+     * @param string              $id
+     *
+     * @return mixed
+     *
+     * @throws ContainerException
+     */
+    public function getParameterInstance(
+        ReflectionParameter $parameter,
+        ContainerInterface $container,
+        string $id
+    ) {
+        if (null === $dependencyClass = $parameter->getClass()) {
+            throw new ContainerException(sprintf(
+                'Unable to autowire service `%s` as it has scalar arguments.',
+                $id
+            ));
+        }
+
+        return $container->get($dependencyClass->getName());
+    }
+
+    /**
+     * Get a new instance of a class with constructor arguments.
+     *
+     * @param ReflectionClass    $class
+     * @param ContainerInterface $container
+     * @param string             $id
+     *
+     * @return mixed
+     *
+     * @throws ContainerException
+     */
+    private function instantiateClassWithConstructor(
+        ReflectionClass $class,
+        ContainerInterface $container,
+        string $id
+    ) {
+        $args = [];
+        foreach ($class->getConstructor()->getParameters() as $parameter) {
+            $args[] = $this->getParameterInstance($parameter, $container, $id);
+        }
+
+        return $class->newInstanceArgs($args);
     }
 }
