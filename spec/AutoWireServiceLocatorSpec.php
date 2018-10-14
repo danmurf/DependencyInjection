@@ -29,8 +29,25 @@ class AutoWireServiceLocatorSpec extends ObjectBehavior
         $this->locate(TestAutoWireService::class, $container)
             ->shouldReturnAnInstanceOf(TestAutoWireService::class);
     }
+
+    public function it_can_locate_a_service_with_dependencies(ContainerInterface $container)
+    {
+        $container->get(TestAutoWireService::class)->willReturn(new TestAutoWireService());
+
+        $this->locate(TestAutoWireServiceWithDependencies::class, $container)
+            ->shouldReturnAnInstanceOf(TestAutoWireServiceWithDependencies::class);
+
+        $container->get(TestAutoWireService::class)->shouldHaveBeenCalled();
+    }
 }
 
 class TestAutoWireService
 {
+}
+
+class TestAutoWireServiceWithDependencies
+{
+    public function __construct(TestAutoWireService $dependency)
+    {
+    }
 }
