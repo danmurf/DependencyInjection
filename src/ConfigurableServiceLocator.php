@@ -38,8 +38,8 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     /**
      * Get a new instance of a service.
      *
-     * @param string             $id        the service id
-     * @param ContainerInterface $container the container to get service dependencies from
+     * @param string             $id        The service id
+     * @param ContainerInterface $container The container to get service dependencies from
      *
      * @throws ContainerException
      * @throws NotFoundException

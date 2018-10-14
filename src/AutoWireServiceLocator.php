@@ -12,7 +12,7 @@ use ReflectionParameter;
 class AutoWireServiceLocator extends ConfigurableServiceLocator
 {
     /**
-     * If the service doesn't exist in config, attemtpt to autowire it.
+     * Load services by infering their dependencies if they aren't specified in config.
      *
      * @param string             $id        The service ID or FQCN
      * @param ContainerInterface $container The container to get service dependencies from
