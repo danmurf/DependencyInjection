@@ -20,6 +20,9 @@ class Container implements ContainerInterface
     /** @var array */
     private $instances = [];
 
+    /** @var array */
+    private $classMap = [];
+
     /**
      * @param ServiceLocatorInterface $serviceLocator
      */
@@ -31,17 +34,18 @@ class Container implements ContainerInterface
     /**
      * Get an instance of a service.
      *
-     * @param string $id Registered service ID or FQCN
+     * @param string $requestedId Registered service ID or FQCN
      *
      * @throws NotFoundException
      */
-    public function get($id)
+    public function get($requestedId)
     {
-        if (!$this->hasInstance($id)) {
-            $this->register($this->serviceLocator->locate($id, $this), $id);
+        if (false === $registeredId = $this->getRegisteredId($requestedId)) {
+            $this->register($this->serviceLocator->locate($requestedId, $this), $requestedId);
+            $registeredId = $requestedId;
         }
 
-        return $this->instances[$id];
+        return $this->instances[$registeredId];
     }
 
     /**
@@ -53,12 +57,12 @@ class Container implements ContainerInterface
      */
     public function has($id): bool
     {
-        if ($this->hasInstance($id)) {
+        if (false !== $this->getRegisteredId($id)) {
             return true;
         }
 
         try {
-            $this->register($this->serviceLocator->locate($id, $this), $id);
+            $this->serviceLocator->locate($id, $this);
         } catch (NotFoundException $exception) {
             return false;
         }
@@ -78,22 +82,33 @@ class Container implements ContainerInterface
             throw new ContainerException('Only objects can be registered with the container.');
         }
 
+        $class = get_class($instance);
+
         if (null === $id) {
-            $id = get_class($instance);
+            $id = $class;
         }
 
         $this->instances[$id] = $instance;
+        $this->classMap[$class] = $id;
     }
 
     /**
-     * Determine if the container has a registered instance of the service.
+     * Get the registered ID for the requested service ID or FQCN.
      *
-     * @param string $id Service id or FQCN
+     * @param string $requestedId Service id or FQCN
      *
-     * @return bool
+     * @return string|bool The registered ID, or false it's not found
      */
-    private function hasInstance(string $id): bool
+    private function getRegisteredId(string $requestedId)
     {
-        return isset($this->instances[$id]);
+        if (isset($this->instances[$requestedId])) {
+            return $requestedId;
+        }
+
+        if (isset($this->classMap[$requestedId])) {
+            return $this->classMap[$requestedId];
+        }
+
+        return false;
     }
 }

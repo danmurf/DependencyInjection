@@ -12,8 +12,13 @@ use Psr\Container\ContainerInterface;
 
 class ContainerSpec extends ObjectBehavior
 {
-    public function let(ServiceLocatorInterface $serviceLocator)
-    {
+    public function let(
+        ServiceLocatorInterface $serviceLocator,
+        ContainerInterface $container
+    ) {
+        $serviceLocator->locate(Argument::type('string'), Argument::type(ContainerInterface::class))
+            ->willThrow(NotFoundException::class);
+
         $this->beConstructedWith($serviceLocator);
     }
 
@@ -94,6 +99,15 @@ class ContainerSpec extends ObjectBehavior
         $serviceLocator->locate(Argument::type('string'), $this)->willThrow(NotFoundException::class);
 
         $this->shouldThrow(NotFoundException::class)->during('get', ['some.service']);
+    }
+
+    public function it_can_return_a_service_with_custom_id_using_the_class_name()
+    {
+        $service = new ContainerTestClass();
+
+        $this->register($service, 'custom.id');
+
+        $this->get(ContainerTestClass::class)->shouldReturn($service);
     }
 }
 
