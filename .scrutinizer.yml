@@ -1,0 +1,23 @@
+build:
+    nodes:
+        analysis:
+            project_setup:
+                override:
+                    - 'true'
+            tests:
+                override:
+                    - php-scrutinizer-run
+                    -
+                        command: 'vendor/bin/phpspec run -f progress -c .phpspec-ci.yml'
+                        coverage:
+                          file: 'coverage.clover'
+                          format: 'php-clover'
+        tests: true
+filter:
+    excluded_paths:
+        - 'spec/*'
+checks:
+    php: true
+
+coding_style:
+    php: { }
