@@ -5,6 +5,7 @@ namespace spec\danmurf\DependencyInjection;
 use danmurf\DependencyInjection\AutoWireServiceLocator;
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
 use danmurf\DependencyInjection\Exception\ContainerException;
+use danmurf\DependencyInjection\Exception\NotFoundException;
 use PhpSpec\ObjectBehavior;
 use Psr\Container\ContainerInterface;
 
@@ -41,12 +42,18 @@ class AutoWireServiceLocatorSpec extends ObjectBehavior
         $container->get(TestAutoWireService::class)->shouldHaveBeenCalled();
     }
 
-    public function it_throws_a_container_exception_when_trying_to_auto_wire_a_service_with_required_scalar_parameters()
+    public function it_throws_a_container_exception_when_trying_to_auto_wire_a_service_with_required_scalar_parameters(ContainerInterface $container)
     {
         $container->get(TestAutoWireService::class)->willReturn(new TestAutoWireService());
 
         $this->shouldThrow(ContainerException::class)
             ->during('locate', [TestAutoWireServiceWithScalarDependencies::class, $container]);
+    }
+
+    public function it_throws_a_not_found_exception_if_the_class_cannot_be_found(ContainerInterface $container)
+    {
+        $this->shouldThrow(NotFoundException::class)
+            ->during('locate', ['InvalidClassName', $container]);
     }
 }
 
