@@ -4,6 +4,7 @@ namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\AutoWireServiceLocator;
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
+use danmurf\DependencyInjection\Exception\ContainerException;
 use PhpSpec\ObjectBehavior;
 use Psr\Container\ContainerInterface;
 
@@ -39,6 +40,14 @@ class AutoWireServiceLocatorSpec extends ObjectBehavior
 
         $container->get(TestAutoWireService::class)->shouldHaveBeenCalled();
     }
+
+    public function it_throws_a_container_exception_when_trying_to_auto_wire_a_service_with_required_scalar_parameters()
+    {
+        $container->get(TestAutoWireService::class)->willReturn(new TestAutoWireService());
+
+        $this->shouldThrow(ContainerException::class)
+            ->during('locate', [TestAutoWireServiceWithScalarDependencies::class, $container]);
+    }
 }
 
 class TestAutoWireService
@@ -48,6 +57,13 @@ class TestAutoWireService
 class TestAutoWireServiceWithDependencies
 {
     public function __construct(TestAutoWireService $dependency)
+    {
+    }
+}
+
+class TestAutoWireServiceWithScalarDependencies
+{
+    public function __construct(TestAutoWireService $dependency, string $someString)
     {
     }
 }
