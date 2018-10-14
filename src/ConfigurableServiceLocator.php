@@ -87,23 +87,61 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             }
 
             if (isset($service['arguments'])) {
-                foreach ($service['arguments'] as $argument) {
-                    if (!isset($argument['type']) || !isset($argument['value'])) {
-                        throw new ContainerException(sprintf(
-                            'Configuration for service `%s` must have `type` and `value` values.',
-                            $id
-                        ));
-                    }
-
-                    if (false === array_search($argument['type'], self::ARGUMENT_TYPES)) {
-                        throw new ContainerException(sprintf(
-                            'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
-                            (string) $argument['type'],
-                            $id
-                        ));
-                    }
-                }
+                $this->validateArguments($service['arguments'], $id);
             }
+        }
+    }
+
+    /**
+     * Ensure the arguments config is in a valid format.
+     *
+     * @param array  $arguments
+     * @param string $id
+     *
+     * @throws ContainerException
+     */
+    private function validateArguments(array $arguments, string $id)
+    {
+        foreach ($arguments as $argument) {
+            $this->validateArgumentProperties($argument, $id);
+            $this->validateArgumentType($argument['type'], $id);
+        }
+    }
+
+    /**
+     * Ensure the argument has valid properties.
+     *
+     * @param array  $argument
+     * @param string $id
+     *
+     * @throws ContainerException
+     */
+    private function validateArgumentProperties(array $argument, string $id)
+    {
+        if (!isset($argument['type']) || !isset($argument['value'])) {
+            throw new ContainerException(sprintf(
+                'Configuration for service `%s` must have `type` and `value` values.',
+                $id
+            ));
+        }
+    }
+
+    /**
+     * Ensure the argument type is valid.
+     *
+     * @param string $type
+     * @param string $id
+     *
+     * @throws ContainerException
+     */
+    private function validateArgumentType(string $type, string $id)
+    {
+        if (false === array_search($type, self::ARGUMENT_TYPES)) {
+            throw new ContainerException(sprintf(
+                'Unknown argument type `%s` for service `%s`. Accepted values are `scalar` and `service`.',
+                $type,
+                $id
+            ));
         }
     }
 }

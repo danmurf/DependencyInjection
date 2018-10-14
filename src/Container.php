@@ -31,7 +31,7 @@ class Container implements ContainerInterface
     /**
      * Get an instance of a service.
      *
-     * @param string $id registered service ID or FQCN
+     * @param string $id Registered service ID or FQCN
      *
      * @throws NotFoundException
      */
@@ -88,7 +88,7 @@ class Container implements ContainerInterface
     /**
      * Determine if the container has a registered instance of the service.
      *
-     * @param string $id service id or FQCN
+     * @param string $id Service id or FQCN
      *
      * @return bool
      */
