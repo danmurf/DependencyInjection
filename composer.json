@@ -3,7 +3,8 @@
     "description": "A lightweight, configurable, auto-wire dependency injection container.",
     "type": "library",
     "require-dev": {
-        "phpspec/phpspec": "^5.0"
+        "phpspec/phpspec": "^4.2",
+        "leanphp/phpspec-code-coverage": "^4.2"
     },
     "autoload": {
         "psr-4": {
@@ -21,6 +22,6 @@
         "psr/container": "^1.0"
     },
     "scripts": {
-        "test": "phpspec run"
+        "test": "vendor/bin/phpspec run"
     }
 }
