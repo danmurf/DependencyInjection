@@ -1,4 +1,0 @@
-suites:
-    dependency_injection_suite:
-        namespace: danmurf\DependencyInjection
-        psr4_prefix: danmurf\DependencyInjection
