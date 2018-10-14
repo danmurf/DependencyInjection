@@ -51,7 +51,7 @@ class AutoWireServiceLocator extends ConfigurableServiceLocator
      *
      * @throws ContainerException
      */
-    public function getParameterInstance(
+    private function getParameterInstance(
         ReflectionParameter $parameter,
         ContainerInterface $container,
         string $id
