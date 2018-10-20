@@ -21,7 +21,7 @@ class ContainerFactory
      *
      * @return Container
      */
-    public function createConfigurableContainer(array $config)
+    public static function createConfigurableContainer(array $config)
     {
         return new Container(new ConfigurableServiceLocator($config));
     }
@@ -34,7 +34,7 @@ class ContainerFactory
      *
      * @return Container
      */
-    public function createAutoWireContainer(array $config)
+    public static function createAutoWireContainer(array $config)
     {
         return new Container(new AutoWireServiceLocator($config));
     }
