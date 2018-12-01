@@ -2,6 +2,7 @@
 
 namespace danmurf\DependencyInjection;
 
+use danmurf\DependencyInjection\Exception\CircularReferenceException;
 use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\Exception\NotFoundException;
 use Psr\Container\ContainerInterface;
@@ -24,7 +25,10 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
         ];
 
     /** @var array */
-    private $config;
+    private $config = [];
+
+    /** @var array */
+    private $locateCalls = [];
 
     /**
      * @param array $config
@@ -46,6 +50,8 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
      */
     public function locate($id, ContainerInterface $container)
     {
+        $this->validateRequest($id);
+
         if (!isset($this->config[$id])) {
             throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
         }
@@ -143,5 +149,19 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
                 $id
             ));
         }
+    }
+
+    /**
+     * @param string $id
+     *
+     * @throws CircularReferenceException
+     */
+    private function validateRequest(string $id)
+    {
+        if (false !== array_search($id, $this->locateCalls)) {
+            throw new CircularReferenceException(sprintf('Circular dependency reference detected for `%s`', $id));
+        }
+
+        $this->locateCalls[] = $id;
     }
 }

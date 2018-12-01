@@ -3,6 +3,7 @@
 namespace spec\danmurf\DependencyInjection;
 
 use danmurf\DependencyInjection\ConfigurableServiceLocator;
+use danmurf\DependencyInjection\Exception\CircularReferenceException;
 use danmurf\DependencyInjection\Exception\ContainerException;
 use danmurf\DependencyInjection\Exception\NotFoundException;
 use danmurf\DependencyInjection\ServiceLocatorInterface;
@@ -154,6 +155,48 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->shouldThrow(ContainerException::class)->duringInstantiation();
     }
+
+    public function it_can_protect_itself_against_circular_dependency_references(
+        ContainerInterface $container
+    ) {
+        $config = [
+            'circular.reference.service1' => [
+                'class' => CircularReferenceTest1::class,
+                'arguments' => [
+                    [
+                        'type' => 'service',
+                        'value' => 'circular.reference.service2',
+                    ],
+                ],
+            ],
+            'circular.reference.service2' => [
+                'class' => CircularReferenceTest2::class,
+                'arguments' => [
+                    [
+                        'type' => 'service',
+                        'value' => 'circular.reference.service1',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+
+        $locator = $this;
+
+        $locateService1 = function () use ($container, $locator) {
+            return $locator->locate('circular.reference.service2', $container);
+        };
+
+        $locateService2 = function () use ($container, $locator) {
+            return $locator->locate('circular.reference.service1', $container);
+        };
+
+        $container->get('circular.reference.service1')->will($locateService1);
+        $container->get('circular.reference.service2')->will($locateService2);
+
+        $this->shouldThrow(CircularReferenceException::class)->during('locate', ['circular.reference.service1', $container]);
+    }
 }
 
 class ConfigurableServiceLocatorTestClass
@@ -170,6 +213,20 @@ class ConfigurableServiceLocatorTestClassWithArgs
 class ConfigurableServiceLocatorTestClassWithServiceArgs
 {
     public function __construct(ConfigurableServiceLocatorTestClass $dependency)
+    {
+    }
+}
+
+class CircularReferenceTest1
+{
+    public function __construct(CircularReferenceTest2 $class)
+    {
+    }
+}
+
+class CircularReferenceTest2
+{
+    public function __construct(CircularReferenceTest1 $test)
     {
     }
 }
