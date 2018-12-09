@@ -37,7 +37,7 @@ class MyClass
 }
 ```
 
-# Configurable services
+## Configurable services
 Have the container locate services based on services definitions.
 ```php
 $config = [
@@ -62,7 +62,7 @@ $container = ContainerFactory::createConfigurableContainer($config);
 $myService = $container->get('my.service.id');
 ```
 
-# Autowired services
+## Autowired services
 Quickly create and use services by allowing the container to infer the config.
 ```php
 // This service location strategy still requires config for services with scalar constructor arguments
