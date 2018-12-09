@@ -9,7 +9,7 @@ To install, run:
 
 `composer require danmurf/dependencyinjection`
 
-## Use it to regiser your services
+## Use it to register your services
 
 ```php
 <?php
