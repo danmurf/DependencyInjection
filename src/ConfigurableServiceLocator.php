@@ -87,14 +87,48 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
      */
     private function validateConfig(array $config)
     {
-        foreach ($config as $id => $service) {
-            if (!isset($service['class'])) {
+        foreach ($config as $id => $definition) {
+            if (isset($definition['class'])) {
+                return $this->validateClassDefinition($definition, $id);
+            }
+
+            if (isset($definition['interface'])) {
+                return $this->validateInterfaceDefinition($definition, $id);
+            }
+
+            throw new ContainerException(sprintf('Configured service `%s` has no `class` or `interface` value.', $id));
+            if (!isset($definition['class'])) {
                 throw new ContainerException(sprintf('Configured service `%s` has no `class` value.', $id));
             }
 
-            if (isset($service['arguments'])) {
-                $this->validateArguments($service['arguments'], $id);
+            if (isset($definition['arguments'])) {
             }
+        }
+    }
+
+    /**
+     * Ensure a class definied service has valid config.
+     *
+     * @param array  $definition
+     * @param string $id
+     */
+    private function validateClassDefinition(array $definition, string $id)
+    {
+        if (isset($definition['arguments'])) {
+            $this->validateArguments($definition['arguments'], $id);
+        }
+    }
+
+    /**
+     * Ensure an interface defined service has valid config.
+     *
+     * @param array  $definition
+     * @param string $id
+     */
+    private function validateInterfaceDefinition(array $definition, strinf $id)
+    {
+        if (!isset($definition['service'])) {
+            throw new ContainerException(sprintf('Configured interface definition `%s` has no `service` value.', $id));
         }
     }
 
