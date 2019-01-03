@@ -56,6 +56,10 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
         }
 
+        if (isset($this->config[$id]['service'])) {
+            return $this->locate($this->config[$id]['service'], $container);
+        }
+
         $class = new ReflectionClass($this->config[$id]['class']);
 
         if (!isset($this->config[$id]['arguments'])) {
@@ -89,14 +93,14 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     {
         foreach ($config as $id => $definition) {
             if (isset($definition['class'])) {
+                // Class service definition
                 $this->validateClassDefinition($definition, $id);
 
                 return;
             }
 
-            if (isset($definition['interface'])) {
-                $this->validateInterfaceDefinition($definition, $id);
-
+            if (isset($definition['service'])) {
+                // Interface service mapping
                 return;
             }
 
