@@ -89,11 +89,15 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     {
         foreach ($config as $id => $definition) {
             if (isset($definition['class'])) {
-                return $this->validateClassDefinition($definition, $id);
+                $this->validateClassDefinition($definition, $id);
+
+                return;
             }
 
             if (isset($definition['interface'])) {
-                return $this->validateInterfaceDefinition($definition, $id);
+                $this->validateInterfaceDefinition($definition, $id);
+
+                return;
             }
 
             throw new ContainerException(sprintf('Configured service `%s` has no `class` or `interface` value.', $id));
