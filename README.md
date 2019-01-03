@@ -62,6 +62,34 @@ $container = ContainerFactory::createConfigurableContainer($config);
 $myService = $container->get('my.service.id');
 ```
 
+## Bind services to interfaces
+Define which service you'd like to use for specific interfaces.
+```php
+$config = [
+    MyInterface::class => [
+        'service' => 'my.service.id'
+    ],
+    'my.service.id' => [
+        'class' => MyService::class,
+        'arguments' => [
+            [
+                'type' => 'scalar',
+                'value' => 123,
+            ],
+            [
+                'type' => 'service',
+                'value' => 'another.service.id',
+            ],
+        ],
+    ],
+];
+
+$container = ContainerFactory::createConfigurableContainer($config);
+
+// The service bound to the interface will be returned
+$myService = $container->get(MyInterface::class);
+```
+
 ## Autowired services
 Quickly create and use services by allowing the container to infer the config.
 ```php
