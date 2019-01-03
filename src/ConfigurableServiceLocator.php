@@ -125,7 +125,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
      * @param array  $definition
      * @param string $id
      */
-    private function validateInterfaceDefinition(array $definition, strinf $id)
+    private function validateInterfaceDefinition(array $definition, string $id)
     {
         if (!isset($definition['service'])) {
             throw new ContainerException(sprintf('Configured interface definition `%s` has no `service` value.', $id));
