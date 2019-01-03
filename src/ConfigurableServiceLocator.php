@@ -97,9 +97,6 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             }
 
             throw new ContainerException(sprintf('Configured service `%s` has no `class` or `interface` value.', $id));
-            if (!isset($definition['class'])) {
-                throw new ContainerException(sprintf('Configured service `%s` has no `class` value.', $id));
-            }
         }
     }
 
