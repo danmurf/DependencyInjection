@@ -100,9 +100,6 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             if (!isset($definition['class'])) {
                 throw new ContainerException(sprintf('Configured service `%s` has no `class` value.', $id));
             }
-
-            if (isset($definition['arguments'])) {
-            }
         }
     }
 
