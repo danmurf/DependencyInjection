@@ -197,6 +197,61 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
 
         $this->shouldThrow(CircularReferenceException::class)->during('locate', ['circular.reference.service1', $container]);
     }
+
+    public function it_allows_interfaces_to_be_defined_in_config()
+    {
+        $config = [
+            InterfaceServiceInterface::class => [
+                'service' => 'service.class',
+            ],
+            'service.class' => [
+                'class' => InterfaceServiceClass::class,
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+        $this->shouldNotThrow(ContainerException::class)->duringInstantiation();
+    }
+
+    public function it_throws_an_exception_if_an_interface_config_definition_doesnt_contain_a_service()
+    {
+        $config = [
+            InterfaceServiceInterface::class => [
+                //'service' => 'service.class', <-- Missing line
+            ],
+            'service.class' => [
+                'class' => InterfaceServiceClass::class,
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+        $this->shouldThrow(ContainerException::class)->duringInstantiation();
+    }
+
+    public function it_can_locate_a_service_bound_to_an_interface(
+        ContainerInterface $container
+    ) {
+        $config = [
+            InterfaceServiceInterface::class => [
+                'service' => 'service.class',
+            ],
+            'service.class' => [
+                'class' => InterfaceServiceClass::class,
+            ],
+        ];
+
+        $this->beConstructedWith($config);
+        $this->locate(InterfaceServiceInterface::class, $container)
+            ->shouldReturnAnInstanceOf(InterfaceServiceClass::class);
+    }
+}
+
+interface InterfaceServiceInterface
+{
+}
+
+class InterfaceServiceClass implements InterfaceServiceInterface
+{
 }
 
 class ConfigurableServiceLocatorTestClass

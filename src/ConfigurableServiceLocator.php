@@ -51,9 +51,10 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     public function locate($id, ContainerInterface $container)
     {
         $this->validateRequest($id);
+        $this->handleServiceNotFound($id);
 
-        if (!isset($this->config[$id])) {
-            throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
+        if (isset($this->config[$id]['service'])) {
+            return $this->locate($this->config[$id]['service'], $container);
         }
 
         $class = new ReflectionClass($this->config[$id]['class']);
@@ -62,6 +63,31 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             return $class->newInstance();
         }
 
+        return $class->newInstanceArgs(
+            $this->getArgs($id, $container)
+        );
+    }
+
+    /**
+     * @param string $id
+     */
+    private function handleServiceNotFound(string $id)
+    {
+        if (!isset($this->config[$id])) {
+            throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
+        }
+    }
+
+    /**
+     * Get the argument values/instances for a specific service.
+     *
+     * @param string             $id
+     * @param ContainerInterface $container
+     *
+     * @return array
+     */
+    private function getArgs(string $id, ContainerInterface $container): array
+    {
         $args = [];
         foreach ($this->config[$id]['arguments'] as $argumentConfig) {
             switch ($argumentConfig['type']) {
@@ -75,7 +101,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             }
         }
 
-        return $class->newInstanceArgs($args);
+        return $args;
     }
 
     /**
@@ -87,14 +113,33 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
      */
     private function validateConfig(array $config)
     {
-        foreach ($config as $id => $service) {
-            if (!isset($service['class'])) {
-                throw new ContainerException(sprintf('Configured service `%s` has no `class` value.', $id));
+        foreach ($config as $id => $definition) {
+            if (isset($definition['class'])) {
+                // Class service definition
+                $this->validateClassDefinition($definition, $id);
+
+                return;
             }
 
-            if (isset($service['arguments'])) {
-                $this->validateArguments($service['arguments'], $id);
+            if (isset($definition['service'])) {
+                // Interface service mapping
+                return;
             }
+
+            throw new ContainerException(sprintf('Configured service `%s` has no `class` or `interface` value.', $id));
+        }
+    }
+
+    /**
+     * Ensure a class definied service has valid config.
+     *
+     * @param array  $definition
+     * @param string $id
+     */
+    private function validateClassDefinition(array $definition, string $id)
+    {
+        if (isset($definition['arguments'])) {
+            $this->validateArguments($definition['arguments'], $id);
         }
     }
 
