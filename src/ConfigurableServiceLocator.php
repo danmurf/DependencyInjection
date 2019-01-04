@@ -51,10 +51,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
     public function locate($id, ContainerInterface $container)
     {
         $this->validateRequest($id);
-
-        if (!isset($this->config[$id])) {
-            throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
-        }
+        $this->handleServiceNotFound($id);
 
         if (isset($this->config[$id]['service'])) {
             return $this->locate($this->config[$id]['service'], $container);
@@ -66,6 +63,31 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             return $class->newInstance();
         }
 
+        return $class->newInstanceArgs(
+            $this->getArgs($id, $container)
+        );
+    }
+
+    /**
+     * @param string $id
+     */
+    private function handleServiceNotFound(string $id)
+    {
+        if (!isset($this->config[$id])) {
+            throw new NotFoundException(sprintf('Unable to locate service `%s` from configuration.', $id));
+        }
+    }
+
+    /**
+     * Get the argument values/instances for a specific service.
+     *
+     * @param string             $id
+     * @param ContainerInterface $container
+     *
+     * @return array
+     */
+    private function getArgs(string $id, ContainerInterface $container): array
+    {
         $args = [];
         foreach ($this->config[$id]['arguments'] as $argumentConfig) {
             switch ($argumentConfig['type']) {
@@ -79,7 +101,7 @@ class ConfigurableServiceLocator implements ServiceLocatorInterface
             }
         }
 
-        return $class->newInstanceArgs($args);
+        return $args;
     }
 
     /**
