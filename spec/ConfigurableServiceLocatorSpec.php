@@ -216,11 +216,11 @@ class ConfigurableServiceLocatorSpec extends ObjectBehavior
     public function it_throws_an_exception_if_an_interface_config_definition_doesnt_contain_a_service()
     {
         $config = [
-            InterfaceServiceInterface::class => [
-                //'service' => 'service.class', <-- Missing line
-            ],
             'service.class' => [
                 'class' => InterfaceServiceClass::class,
+            ],
+            InterfaceServiceInterface::class => [
+                //'service' => 'service.class', <-- Missing line
             ],
         ];
 
