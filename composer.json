@@ -3,7 +3,7 @@
     "description": "A lightweight, configurable, auto-wire dependency injection container.",
     "type": "library",
     "require-dev": {
-        "phpspec/phpspec": "^4.2",
+        "phpspec/phpspec": "^4.2 || ^7.0",
         "leanphp/phpspec-code-coverage": "^4.2"
     },
     "autoload": {
